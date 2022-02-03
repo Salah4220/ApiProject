@@ -1,1 +1,6 @@
-l'application permet d'avoir des information sur des oeuvres artistique
+
+# ApiGomasterclass
+
+the API provides general information on works of art, their year of realization, their director. 
+
+
