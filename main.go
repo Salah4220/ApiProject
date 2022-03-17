@@ -1,32 +1,39 @@
 package main
 
 import (
+	"ApiProject/config"
+	"ApiProject/models"
+	"log"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
+	"testing"
+	"os"
 )
 
-type Oeuvre struct {
-	ID     string `json:"id"`
-	Title  string `json:"title"`
-	Artist string `json:"artist"`
-	Year   int64  `json:"year"`
-}
+func TestMain(m *testing.M) {
+  config.TestDatabaseInit()
 
-var Oeuvres = []Oeuvre{
-	{ID: "1", Title: "Bal du moulin de la Galette ", Artist: "Pierre-Auguste Renoir", Year: 1876},
-	{ID: "2", Title: "Portrait du Docteur Gachet", Artist: "Vincent Van Gogh", Year: 1890},
-	{ID: "3", Title: "Salvator Mundi ", Artist: "Léonard de Vinci", Year: 1500},
-}
+  ret := m.Run()
 
-// renvoi la list des oeuvre en json
-func getOeuvres(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, Oeuvres)
+  config.TestDatabaseDestroy()
+  os.Exit(ret)
 }
 
 func main() {
-	router := gin.Default()
-	router.GET("/Oeuvres", getOeuvres)
+	config.DatabaseInit()
+	router := InitializeRouter()
 
-	router.Run("localhost:8080")
+	// Populate database
+	models.NewOeuvre(&models.Oeuvre{Title: "Bal du moulin de la", Artist: "Pierre-Auguste Renoir", Year: "1876"})
+	models.NewOeuvre(&models.Oeuvre{Title: "Portrait du Docteur", Artist: "Vincent Van Gogh", Year: "1890"})
+	models.NewOeuvre(&models.Oeuvre{Title: "Salvator Mundi", Artist: "Léonard de Vinci", Year: "1500"})
+	
+	log.Println(models.AllOeuvre())
+
+	log.Println("Insertion avec succes")
+	log.Println(models.AllOeuvre())
+	models.DeleteOeuvreById(12)
+	log.Println("Delete avec succes")
+	log.Println(models.AllOeuvre())
+	
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
