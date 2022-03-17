@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+
+  app:
+    container_name: ApiGo
+    build: .
+    ports:
+      - 5432:5432
+    restart: on-failure
+    environment:
+      PORT: 5432
+      DB_CONN: "postgres://postgres:123@oeuvre:5432/db?sslmode=disable"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    links:
+      - db
+
+  db:
+    image: postgres
+    container_name: ApiGo
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "123"
+      POSTGRES_DB: "oeuvre"
+      TZ: 'UTC'
+      PGTZ: 'UTC'
